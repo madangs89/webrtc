@@ -18,13 +18,21 @@ const Home = () => {
     socket.emit("join_room", { email, roomId });
   };
 
+  let handleJoinedRoom = (data) => {
+    console.log("Joined the room successfully", data);
+    navigate(`/room/${data.roomId}`);
+  };
+
   useEffect(() => {
     if (socket) {
-      socket.on("joined_room", (data) => {
-        console.log("Joined the room successfully", data);
-        navigate(`/room/${data.roomId}`);
-      });
+      socket.on("joined_room", handleJoinedRoom);
     }
+
+    return () => {
+      if (socket) {
+        socket.off("joined_room", handleJoinedRoom);
+      }
+    };
   }, [socket]);
 
   useEffect(() => {

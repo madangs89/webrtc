@@ -16,6 +16,7 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 let socketMap = new Map();
+let socketEmailMap = new Map();
 
 io.on("connection", (socket) => {
   console.log("a user connected: " + socket.id);
@@ -23,10 +24,20 @@ io.on("connection", (socket) => {
   socket.on("join_room", (data) => {
     const { roomId, email } = data;
     socketMap.set(email, socket.id);
+    socketEmailMap.set(socket.id, email);
     console.log("Joining the room", email, roomId);
     socket.join(roomId);
     socket.emit("joined_room", { email, roomId });
     socket.broadcast.to(roomId).emit("user_joined", { email });
+  });
+
+  socket.on("call-user", (data) => {
+    const { offer, email } = data;
+    const targetSocketId = socketMap.get(email);
+    let from = socketEmailMap.get(socket.id);
+    if (targetSocketId) {
+      socket.to(targetSocketId).emit("incoming-call", { offer, email, from });
+    }
   });
 
   socket.on("disconnect", (data) => {

@@ -4,11 +4,14 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "./context/Provider.jsx";
+import { PeerProvider } from "./context/PeerProvider.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <Provider>
-      <App />
-    </Provider>
+    <PeerProvider>
+      <Provider>
+        <App />
+      </Provider>
+    </PeerProvider>
   </BrowserRouter>,
 );
