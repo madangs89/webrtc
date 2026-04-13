@@ -17,6 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 let socketMap = new Map();
 let socketEmailMap = new Map();
+let socketRoomMap = new Map();
 
 io.on("connection", (socket) => {
   console.log("a user connected: " + socket.id);
@@ -27,6 +28,7 @@ io.on("connection", (socket) => {
     socketEmailMap.set(socket.id, email);
     console.log("Joining the room", email, roomId, socket.id);
     socket.join(roomId);
+    socketRoomMap.set(socket.id, roomId);
     socket.emit("joined_room", { email, roomId });
     socket.broadcast.to(roomId).emit("user_joined", { email });
   });
@@ -51,6 +53,12 @@ io.on("connection", (socket) => {
     const { answer, from } = data;
     const targetSocketId = socketMap.get(from);
     socket.to(targetSocketId).emit("call-accepted", { answer });
+  });
+
+  socket.on("ice-candidate", (data) => {
+    const roomId = socketRoomMap.get(socket.id);
+    console.log("🖥️ SERVER: relaying ICE candidate to room", roomId);
+    socket.to(roomId).emit("ice-candidate", data);
   });
 
   socket.on("disconnect", (data) => {
