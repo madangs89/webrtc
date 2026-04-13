@@ -8,10 +8,10 @@ import { PeerProvider } from "./context/PeerProvider.jsx";
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <PeerProvider>
-      <Provider>
+    <Provider>
+      <PeerProvider>
         <App />
-      </Provider>
-    </PeerProvider>
+      </PeerProvider>
+    </Provider>
   </BrowserRouter>,
 );

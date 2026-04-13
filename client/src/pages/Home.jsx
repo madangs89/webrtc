@@ -27,16 +27,12 @@ const Home = () => {
     if (socket) {
       socket.on("joined_room", handleJoinedRoom);
     }
-
-    return () => {
-      if (socket) {
-        socket.off("joined_room", handleJoinedRoom);
-      }
-    };
   }, [socket]);
 
   useEffect(() => {
     if (socket == null) {
+      console.log("Setting socket");
+
       let connection = io("http://localhost:3000");
       setSocket(connection);
     }

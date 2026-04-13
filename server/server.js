@@ -25,19 +25,32 @@ io.on("connection", (socket) => {
     const { roomId, email } = data;
     socketMap.set(email, socket.id);
     socketEmailMap.set(socket.id, email);
-    console.log("Joining the room", email, roomId);
+    console.log("Joining the room", email, roomId, socket.id);
     socket.join(roomId);
     socket.emit("joined_room", { email, roomId });
     socket.broadcast.to(roomId).emit("user_joined", { email });
   });
-
   socket.on("call-user", (data) => {
     const { offer, email } = data;
     const targetSocketId = socketMap.get(email);
     let from = socketEmailMap.get(socket.id);
+    console.log(
+      "🖥️ SERVER: sending incoming-call to",
+      email,
+      "socketId:",
+      targetSocketId,
+    );
     if (targetSocketId) {
-      socket.to(targetSocketId).emit("incoming-call", { offer, email, from });
+      setTimeout(() => {
+        // give navya time to mount Room component
+        socket.to(targetSocketId).emit("incoming-call", { offer, from });
+      }, 1000);
     }
+  });
+  socket.on("call-accepted", (data) => {
+    const { answer, from } = data;
+    const targetSocketId = socketMap.get(from);
+    socket.to(targetSocketId).emit("call-accepted", { answer });
   });
 
   socket.on("disconnect", (data) => {
