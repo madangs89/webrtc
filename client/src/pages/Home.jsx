@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useSocket } from "../context/Provider";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const { socket, setSocket } = useSocket();
@@ -8,6 +9,7 @@ const Home = () => {
   const [email, setEmail] = useState("");
   const [roomId, setRoomId] = useState("");
 
+  const navigate = useNavigate();
   const handlRoomJoin = (e) => {
     e.preventDefault();
     console.log(email + " " + roomId);
@@ -15,6 +17,16 @@ const Home = () => {
     if (socket == null || !email || !roomId) return;
     socket.emit("join_room", { email, roomId });
   };
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("joined_room", (data) => {
+        console.log("Joined the room successfully", data);
+        navigate(`/room/${data.roomId}`);
+      });
+    }
+  }, [socket]);
+
   useEffect(() => {
     if (socket == null) {
       let connection = io("http://localhost:3000");
