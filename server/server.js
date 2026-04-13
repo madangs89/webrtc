@@ -15,8 +15,20 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+let socketMap = new Map();
+
 io.on("connection", (socket) => {
   console.log("a user connected: " + socket.id);
+
+  socket.on("join_room", (data) => {
+    const { roomId, email } = data;
+    socketMap.set(email, socket.id);
+
+    console.log("Joining the room", email, roomId);
+
+    socket.join(roomId);
+    socket.broadcast.to(roomId).emit("user_joined", { email });
+  });
 });
 
 app.get("/", (req, res) => {
