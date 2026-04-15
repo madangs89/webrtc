@@ -6,14 +6,22 @@ import { createServer } from "http";
 const app = express();
 let httpServer = createServer(app);
 
+
+
+app.use(express.json());
+app.use(
+  cors({
+    origin: "*",
+  }),
+);
+app.use(bodyParser.urlencoded({ extended: true }));
+
 let io = new Server(httpServer, {
   cors: {
     origin: "*",
   },
 });
-app.use(express.json());
-app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
+
 
 let socketMap = new Map();
 let socketEmailMap = new Map();

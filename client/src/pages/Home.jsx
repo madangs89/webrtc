@@ -33,7 +33,9 @@ const Home = () => {
     if (socket == null) {
       console.log("Setting socket");
 
-      let connection = io("http://localhost:3000");
+      let connection = io("https://b1ec-203-153-32-222.ngrok-free.app", {
+        transports: ["websocket"],
+      });
       setSocket(connection);
     }
   }, [socket]);
